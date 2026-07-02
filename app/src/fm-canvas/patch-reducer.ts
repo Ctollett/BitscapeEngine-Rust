@@ -232,6 +232,9 @@ export function patchReducer(state: FMCanvasPatch, action: PatchAction): FMCanva
     case 'SET_LFO2':
       return { ...state, lfo2Speed: action.speed, lfo2Depth: action.depth, lfo2Waveform: action.waveform, lfo2Mode: action.mode, lfo2Destination: action.destination, lfo2Multiplier: action.multiplier, lfo2Fade: action.fade };
 
+    case 'SET_BITCRUSH':
+      return { ...state, bitcrushEnabled: action.enabled, bitcrushBits: action.bits, bitcrushRate: action.rate };
+
     case 'LOAD_PATCH': {
       const loaded = action.patch;
       if (!loaded.modDepthMatrix) {

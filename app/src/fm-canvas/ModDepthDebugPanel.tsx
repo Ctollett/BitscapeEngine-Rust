@@ -1,5 +1,6 @@
 import { usePatch } from './patch-context';
-import { DEPTH_DECAY_CONSTANT, CANVAS_SIZE } from './constants';
+import { DEPTH_DECAY_CONSTANT, CANVAS_WIDTH } from './constants';
+const CANVAS_SIZE = CANVAS_WIDTH;
 import './mod-depth-debug.css';
 
 /** Euclidean distance between two points. */

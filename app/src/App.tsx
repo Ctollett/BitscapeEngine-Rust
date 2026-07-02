@@ -8,6 +8,7 @@ import { GlobalControlPanel } from './fm-canvas/GlobalControlPanel';
 import { Header } from './components/Header';
 import { colors, borderRadius, spacing } from './tokens';
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from './fm-canvas/constants';
+import DesignGraphic from './assets/landing-reference/design.svg?react';
 
 function App() {
   const [started, setStarted] = useState(false);
@@ -28,9 +29,14 @@ function App() {
   return (
     <div className="app">
       {!started ? (
-        <button className="start-btn" onClick={handleStart} disabled={loading}>
-          {loading ? 'Loading...' : 'Start Audio'}
-        </button>
+        <div className="landing">
+          <DesignGraphic className="landing__graphic" />
+          <h1 className="landing__title">TX-04</h1>
+          <p className="landing__subtitle">BROWSER-BASED FM SOUND DESIGN INSTRUMENT</p>
+          <button className="landing__cta" onClick={handleStart} disabled={loading}>
+            {loading ? 'LOADING...' : 'START AUDIO'}
+          </button>
+        </div>
       ) : (
         <PatchProvider>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 64, padding: spacing.md, width: '100%', boxSizing: 'border-box' }}>

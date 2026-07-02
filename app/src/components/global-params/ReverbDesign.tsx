@@ -33,7 +33,7 @@ export function ReverbDesign() {
   const activeNotes = useRef(0);
   const nextAutoSpawn = useRef(0);
   const echoCounter = useRef(0);
-  const rafRef = useRef<number>();
+  const rafRef = useRef<number>(0);
 
   const rippleEls = useRef<Array<{ l: SVGEllipseElement; r: SVGEllipseElement }>>([]);
   const staticEls = useRef<[SVGGElement | null, SVGGElement | null]>([null, null]);

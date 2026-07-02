@@ -1,5 +1,5 @@
 import { useRef, useEffect } from 'react';
-import { setParam } from '../audio/engine';
+import { setParam, setBitcrush } from '../audio/engine';
 import type { FMCanvasPatch } from './types';
 
 /**
@@ -350,6 +350,11 @@ export function useEngineSync(patch: FMCanvasPatch): void {
       if (!prev || current.operatorWaveforms[i] !== prev.operatorWaveforms[i]) {
         setParam('set_operator_waveform', i, current.operatorWaveforms[i]);
       }
+    }
+
+    // Bitcrush
+    if (!prev || prev.bitcrushEnabled !== current.bitcrushEnabled || prev.bitcrushBits !== current.bitcrushBits || prev.bitcrushRate !== current.bitcrushRate) {
+      setBitcrush(current.bitcrushEnabled, current.bitcrushBits, current.bitcrushRate);
     }
 
     // Snapshot for next diff

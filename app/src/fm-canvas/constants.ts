@@ -111,6 +111,10 @@ export function createInitialPatch(): FMCanvasPatch {
     chorusDelayMs: 7,
     chorusReverbSend: 0,
 
+    bitcrushEnabled: false,
+    bitcrushBits: 8,
+    bitcrushRate: 0.25,
+
     lfo1Speed: 2.0,
     lfo1Depth: 0,
     lfo1Waveform: 1,

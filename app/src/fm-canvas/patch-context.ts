@@ -39,7 +39,8 @@ export type PatchAction =
   | { type: 'SET_REVERB'; enabled: boolean; decay: number; damping: number; mix: number }
   | { type: 'SET_CHORUS'; enabled: boolean; depth: number; speed: number; width: number; hpfCutoff: number; delayMs: number; reverbSend: number }
   | { type: 'SET_LFO1'; speed: number; depth: number; waveform: number; mode: number; destination: number; multiplier: number; fade: number }
-  | { type: 'SET_LFO2'; speed: number; depth: number; waveform: number; mode: number; destination: number; multiplier: number; fade: number };
+  | { type: 'SET_LFO2'; speed: number; depth: number; waveform: number; mode: number; destination: number; multiplier: number; fade: number }
+  | { type: 'SET_BITCRUSH'; enabled: boolean; bits: number; rate: number };
 
  
 

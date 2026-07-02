@@ -45,7 +45,6 @@ interface SaveButtonProps {
 export function SaveButton({ onOpen, onMenuSelect }: SaveButtonProps) {
 
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [selectedItem, setSelectedItem] = useState<Option | null>(null)
   const menuRef = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
@@ -67,7 +66,6 @@ export function SaveButton({ onOpen, onMenuSelect }: SaveButtonProps) {
   }
 
   const handleSelect = (option: Option) => {
-    setSelectedItem(option)
     setIsMenuOpen(false)
     onMenuSelect(option.value)
   }

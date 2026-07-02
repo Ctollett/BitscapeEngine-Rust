@@ -4,6 +4,7 @@ import { patchReducer } from './patch-reducer';
 import { saveLastSession, loadLastSession } from './patch-storage';
 import { useEngineSync } from './use-engine-sync';
 import { createInitialPatch } from './constants';
+import { computeModDepthMatrix } from './depth-mapper';
 
 export function PatchProvider({ children }: { children: ReactNode }) {
   const [patch, dispatch] = useReducer(patchReducer, undefined, () => {
@@ -13,14 +14,17 @@ export function PatchProvider({ children }: { children: ReactNode }) {
     // We can't reverse-map cleanly (20000 Hz → slider 127 → still 20000 Hz),
     // so just reset filter fields to sensible defaults.
     const defaults = createInitialPatch();
+    let migrated = raw;
     if (raw.filterCutoff > 127 || raw.filterResonance < 0.5) {
-      return {
-        ...raw,
-        filterCutoff:    defaults.filterCutoff,
-        filterResonance: defaults.filterResonance,
-      };
+      migrated = { ...migrated, filterCutoff: defaults.filterCutoff, filterResonance: defaults.filterResonance };
     }
-    return raw;
+    if (!migrated.modDepthMatrix) {
+      migrated = { ...migrated, modDepthMatrix: computeModDepthMatrix(migrated) };
+    }
+    if (migrated.bitcrushEnabled === undefined) {
+      migrated = { ...migrated, bitcrushEnabled: false, bitcrushBits: 8, bitcrushRate: 0.25 };
+    }
+    return migrated;
   });
 
   // Sync patch changes to the WASM engine

@@ -1,5 +1,4 @@
 import { ADSRSection } from './ADSRSection';
-import { MasterPanel } from './MasterPanel';
 
 import { spacing } from '../../tokens';
 

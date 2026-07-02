@@ -16,7 +16,7 @@ export function Header() {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto', gridTemplateRows: '28px 12px', width: '100%', flex: 1, alignContent: 'center', columnGap: spacing['3xl'], rowGap: spacing.sm, }}>
         {/* Title column — spans both rows via subgrid */}
         <div style={{ gridColumn: 1, gridRow: '1 / 3', display: 'grid', gridTemplateRows: 'subgrid', alignItems: 'center' }}>
-          <span style={{ ...typography.title.sm, fontSize: 28, color: colors.text.title, lineHeight: 1, display: 'block' }}>TX-84</span>
+          <span style={{ ...typography.title.sm, fontSize: 28, color: colors.text.title, lineHeight: 1, display: 'block' }}>TX-04</span>
           <span style={{ ...typography.label.sm, fontSize: 8, color: colors.text.title, lineHeight: 1, display: 'block' }}>BROWSER-BASED FM SOUND DESIGN INSTRUMENT</span>
         </div>
         {/* PresetSelect — spans both rows via subgrid */}

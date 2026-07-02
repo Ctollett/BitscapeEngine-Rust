@@ -242,6 +242,7 @@ void main() {
       opIndex={i}
       isCarrier={false}
       dragPos={interaction.mode === 'drawing-connection' && interaction.fromOp === i ? interaction.mousePos : null}
+      isConnectionSource={interaction.mode === 'drawing-connection' && interaction.fromOp === i}
       isTargetable={interaction.mode === 'drawing-connection' && interaction.fromOp !== i}
       onDragMove={handleStringTension}
       onStartConnection={(opIndex) => setInteraction({ mode: 'drawing-connection', fromOp: opIndex, mousePos: null })}

@@ -24,7 +24,7 @@ export function ChorusDesign() {
   const offsetRef   = useRef(0);
   const velocityRef = useRef(0);
   const activeNotes = useRef(0);
-  const rafRef = useRef<number>();
+  const rafRef = useRef<number>(0);
 
   useEffect(() => {
     const offNoteOn  = onNoteOn(()  => { activeNotes.current += 1; });

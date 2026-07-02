@@ -75,6 +75,7 @@ interface OperatorNodeProps {
   onDragMove?: (opIndex: number, pos: Point) => void;
   dragPos?: Point | null;
   isTargetable?: boolean;
+  isConnectionSource?: boolean;
   getPullToward?: () => Point | null;
   onPullStrength?: (strength: number) => void;
 }
@@ -106,6 +107,7 @@ export function OperatorNode({
   onDragMove,
   dragPos,
   isTargetable,
+  isConnectionSource,
   getPullToward,
   onPullStrength,
 }: OperatorNodeProps) {
@@ -136,10 +138,12 @@ export function OperatorNode({
   const isPlayingRef = useRef(false)
   const windingDownRef = useRef(false)
   const windFrameRef = useRef(0)
+  const dragPosRef = useRef<Point | null>(null)
   getPullRef.current = getPullToward
   onPullStrengthRef.current = onPullStrength
   opPosRef.current = op.position
   patchRef.current = patch
+  dragPosRef.current = dragPos ?? null
 
   // Ring deformation RAF — owns display and d attributes directly (React never sets them)
   useEffect(() => {
@@ -163,6 +167,20 @@ export function OperatorNode({
         if (!pathEl || !circleEl) return
         pathEl.style.display = 'none'
         circleEl.style.display = ''
+      }
+
+      // Connection-drag source: deform ring toward mouse cursor
+      const connDrag = dragPosRef.current
+      if (connDrag) {
+        const dx = connDrag.x - cx
+        const dy = connDrag.y - cy
+        const dist = Math.sqrt(dx * dx + dy * dy)
+        if (dist > 0) pullDirRef.current = { x: dx / dist, y: dy / dist }
+        const pullStrength = Math.min(dist * 0.025, RING_RADIUS * 0.45)
+        bumpAmountRef.current += (pullStrength - bumpAmountRef.current) * 0.12
+        wasTensionRef.current = true
+        showBump(bumpAmountRef.current)
+        raf = requestAnimationFrame(tick); return
       }
 
       if (target) {
@@ -272,6 +290,11 @@ export function OperatorNode({
             wavePathRef.current.setAttribute('d', computeFMWavePath(opIndex, patchRef.current, phaseRef.current))
           }
         }
+      } else {
+        // Idle: redraw static waveform so patch changes (waveform type, mod depth) are reflected immediately
+        if (wavePathRef.current) {
+          wavePathRef.current.setAttribute('d', computeFMWavePath(opIndex, patchRef.current, phaseRef.current))
+        }
       }
       waveRaf = requestAnimationFrame(tick)
     }
@@ -298,6 +321,7 @@ export function OperatorNode({
   }, [dispatch, opIndex]);
 
   const onPointerDown = (e: React.PointerEvent) => {
+    e.preventDefault()
     onSelect(opIndex)
     e.stopPropagation()
     const canvas = nodeRef.current?.parentElement?.getBoundingClientRect()
@@ -310,6 +334,7 @@ export function OperatorNode({
   }
 
   const onPointerDownRing = (e: React.PointerEvent) => {
+    e.preventDefault()
     e.stopPropagation()
     document.body.style.cursor = 'grabbing'
     onStartConnection(opIndex)
@@ -343,18 +368,11 @@ export function OperatorNode({
       {(() => {
         const isConnected = patch.connections.some(c => c.src === opIndex || c.dst === opIndex)
         const ringColor = isTargetable ? 'white' : OPERATOR_COLORS[opIndex]
-        const activePull = dragPos ?? null
-        return (isSelected || isConnected || isTargetable) ? (
+        return (isSelected || isConnected || isTargetable || isConnectionSource) ? (
           <svg onPointerDown={onPointerDownRing} onPointerUp={onPointerUp} style={{ cursor: 'grab', position: 'absolute', left: 0, top: 0, overflow: 'visible', pointerEvents: 'all' }} width={0} height={0}>
-            {activePull ? (
-              <path d={deformedRingPath(op.position.x, op.position.y, RING_RADIUS, activePull.x, activePull.y)} fill="none" stroke={ringColor} strokeWidth={2} strokeDasharray="6 4" />
-            ) : (
-              <>
-                {/* d and display are owned entirely by the RAF — no d prop here */}
-                <path ref={ringPathRef} fill="none" stroke={ringColor} strokeWidth={2} strokeDasharray="6 4" />
-                <circle ref={ringCircleRef} className={isTargetable ? 'ring-targetable' : ''} cx={op.position.x} cy={op.position.y} r={RING_RADIUS} fill="none" stroke={ringColor} strokeWidth={2} strokeDasharray="6 4" />
-              </>
-            )}
+            {/* d and display owned entirely by the RAF */}
+            <path ref={ringPathRef} fill="none" stroke={ringColor} strokeWidth={2} strokeDasharray="6 4" />
+            <circle ref={ringCircleRef} className={isTargetable ? 'ring-targetable' : ''} cx={op.position.x} cy={op.position.y} r={RING_RADIUS} fill="none" stroke={ringColor} strokeWidth={2} strokeDasharray="6 4" />
           </svg>
         ) : null
       })()}

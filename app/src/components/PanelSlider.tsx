@@ -1,64 +1,135 @@
 import { useRef, useState } from 'react';
+import { colors, spacing } from '../tokens';
+import { motion } from 'framer-motion';
 
-import { borderRadius, colors } from '../tokens';
+const DIGIT_H = 14
+const DIGITS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
-import { typography } from '../tokens';
+function ReelDigit({ digit, color }: { digit: number; color: string }) {
+  return (
+    <div style={{ height: DIGIT_H, overflow: 'hidden', width: '0.62em' }}>
+      <motion.div
+        animate={{ y: -digit * DIGIT_H }}
+        transition={{ type: 'spring', stiffness: 480, damping: 36 }}
+      >
+        {DIGITS.map(d => (
+          <div key={d} style={{ height: DIGIT_H, lineHeight: `${DIGIT_H}px`, color }}>
+            {d}
+          </div>
+        ))}
+      </motion.div>
+    </div>
+  )
+}
 
-import { spacing } from '../tokens';
-
-import { motion, animate } from 'framer-motion';
+function ReelNumber({ value, color }: { value: number; color: string }) {
+  const digits = String(value).padStart(3, '0').split('').map(Number)
+  return (
+    <div style={{ display: 'flex', fontSize: 11, fontFamily: 'monospace', fontVariantNumeric: 'tabular-nums' }}>
+      {digits.map((d, i) => <ReelDigit key={i} digit={d} color={color} />)}
+    </div>
+  )
+}
 
 interface PanelSliderProps {
   value: number;
   onChange: (value: number) => void;
   label: string;
   color?: string;
+  worn?: boolean;
 }
 
-const circleSize = 14
-const halfCircleSize = circleSize / 2
+const TRACK_H = 140
+const HANDLE_R = 6
 
-
-
-export function PanelSlider({ value, onChange, label, color = '#4E7AAA' }: PanelSliderProps) {
+export function PanelSlider({ value, onChange, label, color = '#4E7AAA', worn = false }: PanelSliderProps) {
   const trackRef = useRef<HTMLDivElement>(null);
   const isDragging = useRef(false);
-  const [showValue, setShowValue] = useState(false);
+  const [active, setActive] = useState(false);
+  const filterId = useRef(`worn-${Math.random().toString(36).slice(2, 7)}`).current
 
-const onPointerDown = (e: React.PointerEvent) => {
-  e.preventDefault();
-  isDragging.current = true;
-  setShowValue(true);
-  e.currentTarget.setPointerCapture(e.pointerId);
-}
+  const onPointerDown = (e: React.PointerEvent) => {
+    e.preventDefault();
+    isDragging.current = true;
+    setActive(true);
+    e.currentTarget.setPointerCapture(e.pointerId);
+  }
 
-const onPointerMove = (e: React.PointerEvent) => {
-  if (!isDragging.current || !trackRef.current) return;
-  const { top, height } = trackRef.current.getBoundingClientRect();
-  const y = e.clientY - top;
-  const newValue = Math.max(0, Math.min(1, 1 - y / height))
-  onChange(newValue)
-}
+  const onPointerMove = (e: React.PointerEvent) => {
+    if (!isDragging.current || !trackRef.current) return;
+    const { top, height } = trackRef.current.getBoundingClientRect();
+    const y = e.clientY - top;
+    onChange(Math.max(0, Math.min(1, 1 - y / height)))
+  }
 
-const onPointerUp = () => {
-  isDragging.current = false;
-  setShowValue(false);
-}
+  const onPointerUp = () => {
+    isDragging.current = false;
+    setActive(false);
+  }
+
+  const fillH = value * TRACK_H
+  const handleY = TRACK_H - fillH
+  const handleR = active ? HANDLE_R + 4 : HANDLE_R
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', userSelect: 'none', WebkitUserSelect: 'none', gap: spacing.sm, width: '16px' }}>
-      <div onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp}style={{cursor: 'pointer', position: 'relative', height: '140px', width: '2px', borderRadius: borderRadius.md, backgroundColor: colors.control.track, overflow: 'visible'  }} ref={trackRef}>
-        <div style={{position: 'absolute', backgroundColor: color as unknown as string, height: `${value * 140}px`, width: '2px', bottom: 0, borderRadius: borderRadius.md, overflow: 'visible' }} />
-        <motion.div  transition={{ type: 'spring', stiffness: 200, damping: 35 }} animate={{ width: showValue ? 24 : 16, height: showValue ? 24 : 16 }} style={{display: 'flex', justifyContent: 'center',  bottom: value * 140 - halfCircleSize, left: "50%", transform: 'translateX(-50%)', position: 'absolute',alignItems: 'center', borderRadius: '50%', backgroundColor: 'transparent', border: `1px solid ${color}`}}>
-            <div style={{ height: '12px', width: '12px', borderRadius: '50%', backgroundColor: color,
-                 }}>
-        </div>
-     </motion.div>    
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', userSelect: 'none', WebkitUserSelect: 'none', gap: spacing.sm }}>
+      <ReelNumber value={Math.round(value * 100)} color={color} />
+      <div
+        ref={trackRef}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+        style={{ cursor: 'pointer', position: 'relative', height: TRACK_H, width: 2, backgroundColor: colors.control.track, overflow: 'visible' }}
+      >
+        {worn ? (
+          <svg
+            width={50} height={TRACK_H}
+            style={{ position: 'absolute', left: -24, top: 0, overflow: 'visible', pointerEvents: 'none' }}
+          >
+            <defs>
+              <filter id={filterId} x="-60%" y="-10%" width="220%" height="120%" colorInterpolationFilters="sRGB">
+                <feTurbulence type="turbulence" baseFrequency="0.06 0.04" numOctaves="4" seed="5" result="chipNoise" />
+                <feColorMatrix in="chipNoise" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -4 0 0 0 3.7" result="chipAlpha" />
+                <feTurbulence type="turbulence" baseFrequency="0.55 0.018" numOctaves="2" seed="11" result="scratchNoise" />
+                <feColorMatrix in="scratchNoise" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  -9 0 0 0 8.4" result="scratchAlpha" />
+                <feComposite in="chipAlpha" in2="scratchAlpha" operator="arithmetic" k1="0" k2="1" k3="1" k4="-1" result="mask" />
+                <feComposite in="SourceGraphic" in2="mask" operator="in" result="chipped" />
+                <feTurbulence type="turbulence" baseFrequency="0.12" numOctaves="2" seed="3" result="disp" />
+                <feDisplacementMap in="chipped" in2="disp" scale="1.2" xChannelSelector="R" yChannelSelector="G" />
+              </filter>
+            </defs>
+            {/* Fill */}
+            <rect x={24} y={handleY} width={2} height={fillH} fill={color} filter={`url(#${filterId})`} rx={1} />
+            {/* Handle ring */}
+            <motion.circle
+              cx={25} cy={handleY}
+              animate={{ r: handleR + 3 }}
+              transition={{ type: 'spring', stiffness: 200, damping: 35 }}
+              fill="none" stroke={color} strokeWidth={1}
+              filter={`url(#${filterId})`}
+            />
+            {/* Handle fill */}
+            <circle
+              cx={25} cy={handleY}
+              r={HANDLE_R}
+              fill={color}
+              filter={`url(#${filterId})`}
+            />
+          </svg>
+        ) : (
+          <>
+            <div style={{ position: 'absolute', backgroundColor: color, height: `${fillH}px`, width: 2, bottom: 0 }} />
+            <motion.div
+              transition={{ type: 'spring', stiffness: 200, damping: 35 }}
+              animate={{ width: active ? 24 : 16, height: active ? 24 : 16 }}
+              style={{ display: 'flex', justifyContent: 'center', bottom: fillH - HANDLE_R, left: '50%', transform: 'translateX(-50%)', position: 'absolute', alignItems: 'center', borderRadius: '50%', backgroundColor: 'transparent', border: `1px solid ${color}` }}
+            >
+              <div style={{ height: 12, width: 12, borderRadius: '50%', backgroundColor: color }} />
+            </motion.div>
+          </>
+        )}
       </div>
-      <div style={{ display: 'grid', placeItems: 'center', minWidth: '24px', width: 'fit-content' }}>
-        <span style={{ gridArea: '1/1', ...typography.label.sm, color: colors.text.muted, userSelect: 'none', WebkitUserSelect: 'none', textAlign: 'center', opacity: showValue ? 0 : 1 }}>{label}</span>
-        <span style={{ gridArea: '1/1', ...typography.label.sm, color: colors.text.muted, userSelect: 'none', WebkitUserSelect: 'none', textAlign: 'center', opacity: showValue ? 1 : 0, fontVariantNumeric: 'tabular-nums', minWidth: '2ch' }}>{Math.round(value * 100)}</span>
-      </div>
+      <span style={{ fontFamily: 'monospace', fontSize: 9, color: colors.text.muted, letterSpacing: 1, opacity: 0.6 }}>{label}</span>
     </div>
   );
 }

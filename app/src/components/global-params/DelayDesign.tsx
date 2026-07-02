@@ -36,7 +36,7 @@ export function DelayDesign() {
   const ripples = useRef<Ripple[]>([]);
   const pending = useRef<PendingRipple[]>([]);
   const frameRef = useRef(0);
-  const rafRef = useRef<number>();
+  const rafRef = useRef<number>(0);
 
   useEffect(() => {
     const svg = svgRef.current;

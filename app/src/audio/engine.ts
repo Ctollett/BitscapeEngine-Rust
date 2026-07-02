@@ -2,8 +2,8 @@ import { emitNoteOn, emitNoteOff } from './note-events';
 
 let audioCtx: AudioContext | null = null;
 let workletNode: AudioWorkletNode | null = null;
+let bitcrusherNode: AudioWorkletNode | null = null;
 let analyserL: AnalyserNode | null = null;
-let analyserR: AnalyserNode | null = null;
 let ready = false;
 
 export async function initAudio(): Promise<void> {
@@ -21,10 +21,15 @@ export async function initAudio(): Promise<void> {
   const wasmModule = await WebAssembly.compile(wasmBytes);
 
   await audioCtx.audioWorklet.addModule('/synth_worklet.js');
+  await audioCtx.audioWorklet.addModule('/bitcrusher_worklet.js');
 
   workletNode = new AudioWorkletNode(audioCtx, 'synth-processor', {
     outputChannelCount: [2],
     processorOptions: { wasmModule, sampleRate: audioCtx.sampleRate },
+  });
+
+  bitcrusherNode = new AudioWorkletNode(audioCtx, 'bitcrusher-processor', {
+    outputChannelCount: [2],
   });
 
   analyserL = audioCtx.createAnalyser();
@@ -33,8 +38,9 @@ export async function initAudio(): Promise<void> {
   analyserL.minDecibels = -120;
   analyserL.maxDecibels = 0;
 
-  // Tap the worklet output → analyser → destination (in-line, guaranteed to process)
-  workletNode.connect(analyserL);
+  // synth → bitcrusher → analyser → destination
+  workletNode.connect(bitcrusherNode);
+  bitcrusherNode.connect(analyserL);
   analyserL.connect(audioCtx.destination);
 
   return new Promise<void>((resolve) => {
@@ -97,6 +103,13 @@ export function noteOff(noteId: number): void {
 export function setParam(fn: string, ...args: (number | boolean | Uint32Array | Float32Array)[]): void {
   if (!ready || !workletNode) return;
   workletNode.port.postMessage({ type: 'param', fn, args });
+}
+
+export function setBitcrush(enabled: boolean, bits: number, rate: number): void {
+  if (!bitcrusherNode) return;
+  bitcrusherNode.port.postMessage({ type: 'enabled', value: enabled });
+  bitcrusherNode.port.postMessage({ type: 'bits',    value: bits });
+  bitcrusherNode.port.postMessage({ type: 'rate',    value: rate });
 }
 
 export function isReady(): boolean {

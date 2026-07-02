@@ -14,7 +14,6 @@ export default function Dropdown({placeholder, options, onChange}: DropdownProps
     const dropdownRef = useRef<HTMLDivElement>(null)
     const [isOpen, setIsOpen] = useState(false)
     const [selected, setSelected] = useState<Option | null>(null)
-    const [hover, setIsHovered] = useState(false)
 
     useEffect(() => {
         const handleOutside = (e: MouseEvent) => {

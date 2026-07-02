@@ -109,8 +109,8 @@ export const colors = {
   section: {
     adsr:   '#4E7AAA',
     filter: '#5A7870',
-    lfo1:   '#B07080',
-    lfo2:   '#BF8C3A',
+    lfo1:   '#4A8C5C',
+    lfo2:   '#6AAF72',
   },
   state: {
     hover:  'rgba(10, 9, 8, 0.05)',

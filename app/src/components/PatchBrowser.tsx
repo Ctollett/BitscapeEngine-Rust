@@ -19,7 +19,7 @@ export function PatchBrowser() {
     const handleSave = () => {
         const name = window.prompt('Patch name:');
         if (!name) return;
-        saveToLibrary(name, patch);
+        saveToLibrary(name, patch, '');
         setLibrary(loadLibrary());
     };
 
@@ -57,7 +57,7 @@ export function PatchBrowser() {
         importPatchFile(file).then(imported => {
             dispatch({ type: 'LOAD_PATCH', patch: imported });
             const name = file.name.replace(/\.json$/i, '');
-            saveToLibrary(name, imported);
+            saveToLibrary(name, imported, '');
             setLibrary(loadLibrary());
         }).catch(() => {
             alert('Failed to import patch — invalid file.');

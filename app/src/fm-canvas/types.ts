@@ -95,6 +95,10 @@ export interface FMCanvasPatch {
   chorusDelayMs: number;    // ms
   chorusReverbSend: number; // 0.0-1.0
 
+  bitcrushEnabled: boolean;
+  bitcrushBits: number;    // 1-16 bit depth
+  bitcrushRate: number;    // 0.01-1.0 sample rate fraction
+
   // LFOs
   lfo1Speed: number;        // 0.0-10.0 Hz
   lfo1Depth: number;        // 0.0-1.0

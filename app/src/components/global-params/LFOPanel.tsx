@@ -38,15 +38,6 @@ const DESTINATIONS: { value: number; label: string; group: string }[] = [
 ];
 
 
-const WAVEFORMS = [
-  { value: 0, label: '△', title: 'Triangle' },
-  { value: 1, label: '∿', title: 'Sine' },
-  { value: 2, label: '⊓', title: 'Square' },
-  { value: 3, label: '⊿', title: 'Sawtooth' },
-  { value: 4, label: '⌒', title: 'Exponential' },
-  { value: 5, label: '⟋', title: 'Ramp' },
-  { value: 6, label: '?', title: 'Random' },
-];
 
 const MODES = [
   { value: 0, label: 'Free' },

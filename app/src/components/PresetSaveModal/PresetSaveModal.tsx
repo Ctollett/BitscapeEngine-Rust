@@ -1,7 +1,5 @@
 import './PresetSaveModal.css';
 import ModalDot from '../../assets/svgs/modal-dot.svg?react';
-import SaveIcon from '../../assets/svgs/save.svg?react';
-import XIcon from '../../assets/svgs/lucide/x.svg?react';
 import Dropdown from '../UI/Dropdown/Dropdown';
 import type { Option } from '../../fm-canvas/types';
 import { useState } from 'react';

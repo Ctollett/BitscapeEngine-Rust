@@ -1,4 +1,3 @@
-import { PanelKnob } from '../PanelKnob';
 import { PanelSlider } from '../PanelSlider';
 import { usePatch } from '../../fm-canvas/patch-context';
 
