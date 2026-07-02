@@ -1,10 +1,12 @@
-# TX-84
+# TX-04
 
 A 4-operator FM synthesizer with a visual patching canvas, built on a Rust/WebAssembly audio engine.
 
+Live: [tx-04.com](https://www.tx-04.com)
+
 ## Overview
 
-TX-84 is a browser-based FM synth inspired by classic 4-operator hardware (think Yamaha's TX/DX series). The synthesis engine is written in Rust and compiled to WebAssembly for real-time audio, paired with a React canvas where you drag connections between operators to build your own algorithms instead of picking from a fixed list.
+TX-04 is a browser-based FM synth inspired by classic 4-operator hardware (think Yamaha's TX/DX series). The synthesis engine is written in Rust and compiled to WebAssembly for real-time audio, paired with a React canvas where you drag connections between operators to build your own algorithms instead of picking from a fixed list.
 
 ## Features
 
